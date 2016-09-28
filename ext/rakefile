@@ -1,0 +1,41 @@
+Rubies = {
+  "1.9" => "193",
+  "2.0" => "200",
+  "2.1" => "216"
+}
+
+ExtDir = "../lib/ox/native/ext"
+
+def build_so(part, version, devkit)
+  extdir = File.expand_path(ExtDir + "/" + version)
+  cd part do
+    sh "make clean" if File.exists?("makefile")
+    # recreate the def file if necessary
+    FileList["*.def.orig"].each do |f|
+      cp f, f.sub(/\.orig$/, "")
+    end
+    if RUBY_PLATFORM =~ /linux/ || RUBY_PLATFORM =~ /darwin/
+      sh "rm -f *.o" # force recompile, otherwise only compiled for one ruby version
+      sh "/bin/bash --login -c \"rvm use #{version} && ruby extconf.rb && make && make static\""
+    else
+      sh "cmd /C \"#{devkit}/devkitvars.bat && pik use #{Rubies[version]} && ruby extconf.rb && make && make static\""
+    end
+    mkdir_p extdir unless File.exist?(extdir)
+    if RUBY_PLATFORM =~ /darwin/ 
+      mv "#{part}.bundle", extdir
+    else
+      mv "#{part}.so", extdir
+    end
+  end
+end
+
+task :default, [:devkit19, :devkit20, :devkit21] do |t, args|
+  unless args[:devkit19] && args[:devkit20] && args[:devkit21]
+    abort 'provide devkits for Rubies 1.9, 2.0, 2.1, e.g. rake default[c:\\tools\\tdm,c:\\tools\\mingw64-32,c:\\tools\\mingw64-32]'
+  end
+  build_so("ox", "1.9", args[:devkit19])
+  build_so("ox", "2.0", args[:devkit20])
+  build_so("ox", "2.1", args[:devkit21])
+  puts 'Build finished'
+end
+

@@ -1,5 +1,6 @@
 
 require 'date'
+require 'rake'
 require File.join(File.dirname(__FILE__), 'lib/ox/version')
 
 Gem::Specification.new do |s|
@@ -18,9 +19,9 @@ XML parsers for generic XML parsing and as an alternative to Marshal for Object
 serialization. }
 
   s.licenses = ['MIT']
-  s.files = Dir["{lib,ext}/**/*.{rb,h,c}"] + ['LICENSE', 'README.md']
+  s.files = Dir["{lib,ext}/**/*.rb"] + ['LICENSE', 'README.md']
 
-  s.extensions = ["ext/ox/extconf.rb"]
+  s.extensions = []
   # s.executables = []
 
   s.require_paths = ["lib", "ext"]
@@ -30,4 +31,7 @@ serialization. }
   s.rdoc_options = ['--main', 'README.md', '--title', 'Ox Documentation', '--exclude', 'extconf.rb']
   
   s.rubyforge_project = 'ox'
+  
+  s.platform = Gem::Platform::CURRENT
+  s.files = Rake::FileList.new("lib/**/*.{rb,so}")
 end
