@@ -30,7 +30,8 @@ def build_so(part, version, devkit)
 end
 
 task :default, [:devkit19, :devkit20, :devkit21] do |t, args|
-  unless args[:devkit19] && args[:devkit20] && args[:devkit21]
+  is_windows = RbConfig::CONFIG['host_os'] =~ /(mingw|mswin)/
+  unless !is_windows || (args[:devkit19] && args[:devkit20] && args[:devkit21])
     abort 'provide devkits for Rubies 1.9, 2.0, 2.1, e.g. rake default[c:\\tools\\tdm,c:\\tools\\mingw64-32,c:\\tools\\mingw64-32]'
   end
   build_so("ox", "1.9", args[:devkit19])

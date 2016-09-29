@@ -76,4 +76,12 @@ require 'ox/document'
 require 'ox/bag'
 require 'ox/sax'
 
-require 'ox/ox' # C extension
+begin
+  require "ox/native/ext/#{RUBY_VERSION[0..2]}/ox"
+rescue LoadError
+end
+
+begin
+  require 'ox/ox'
+rescue LoadError
+end
